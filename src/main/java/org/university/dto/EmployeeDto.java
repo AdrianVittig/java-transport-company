@@ -17,9 +17,10 @@ public class EmployeeDto {
     private String firstName;
     private String lastName;
     private LocalDate birthDate;
-    private Set<DriverQualifications> driverQualifications;
     private Long drivingLicenseId;
+    private Set<DriverQualifications> driverQualifications;
     private Long companyId;
     private BigDecimal salary;
-
+    private Set<Long> vehicleIds;
+    private Set<Long> transportIds;
 }

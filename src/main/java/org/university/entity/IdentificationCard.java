@@ -14,7 +14,6 @@ import java.time.LocalDate;
 @NoArgsConstructor
 @AllArgsConstructor
 public class IdentificationCard extends BaseEntity {
-
     @NotBlank
     @Column(name = "card_number", unique = true)
     private String cardNumber;
