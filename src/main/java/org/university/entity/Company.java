@@ -37,4 +37,5 @@ public class Company extends BaseEntity {
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "company")
     @ToString.Exclude
     private Set<Transport> transportSet = new HashSet<>();
+
 }

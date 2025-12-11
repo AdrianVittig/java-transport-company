@@ -6,6 +6,8 @@ import lombok.*;
 import org.university.util.VehicleType;
 
 import java.math.BigDecimal;
+import java.util.HashSet;
+import java.util.Set;
 
 @Entity
 @Table(name = "vehicle")
@@ -34,4 +36,8 @@ public class Vehicle extends BaseEntity {
     @JoinColumn(name = "company_id")
     @ToString.Exclude
     private Company company;
+
+    @OneToMany(mappedBy = "vehicle")
+    @ToString.Exclude
+    private Set<Transport> transportSet = new HashSet<>();
 }

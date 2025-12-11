@@ -10,8 +10,10 @@ import java.util.List;
 
 public class CustomerDao {
     public void createCustomer(Customer customer) throws DAOException {
+        Session session = null;
         Transaction transaction = null;
-        try (Session session = SessionFactoryUtil.getSessionFactory().openSession()) {
+        try {
+            session = SessionFactoryUtil.getSessionFactory().openSession();
             transaction = session.beginTransaction();
             session.persist(customer);
             transaction.commit();
@@ -20,25 +22,43 @@ public class CustomerDao {
                 transaction.rollback();
             }
             throw new DAOException("Failed to create customer: " + e.getMessage());
+        }finally {
+            if(session != null && session.isOpen()){
+                session.close();
+            }
         }
     }
 
     public Customer getCustomerById(long id) {
-        try (Session session = SessionFactoryUtil.getSessionFactory().openSession()) {
+        Session session = null;
+        try{
+            session = SessionFactoryUtil.getSessionFactory().openSession();
             return session.find(Customer.class, id);
+        }finally {
+            if(session != null && session.isOpen()){
+                session.close();
+            }
         }
     }
 
     public List<Customer> getAllCustomers() {
-        try (Session session = SessionFactoryUtil.getSessionFactory().openSession()) {
+        Session session = null;
+        try{
+            session = SessionFactoryUtil.getSessionFactory().openSession();
             return session.createQuery("SELECT c FROM Customer c", Customer.class)
                     .getResultList();
+        }finally {
+            if(session != null && session.isOpen()){
+                session.close();
+            }
         }
     }
 
     public void updateCustomer(long id, Customer updated) throws DAOException {
         Transaction transaction = null;
-        try (Session session = SessionFactoryUtil.getSessionFactory().openSession()) {
+        Session session = null;
+        try {
+            session = SessionFactoryUtil.getSessionFactory().openSession();
             transaction = session.beginTransaction();
 
             Customer customer = session.find(Customer.class, id);
@@ -58,13 +78,18 @@ public class CustomerDao {
         } catch (Exception e) {
             if (transaction != null) transaction.rollback();
             throw new DAOException("Failed to update customer: " + e.getMessage());
+        }finally {
+            if(session != null && session.isOpen()){
+                session.close();
+            }
         }
     }
 
     public void deleteCustomer(long id) throws DAOException {
         Transaction transaction = null;
-
-        try (Session session = SessionFactoryUtil.getSessionFactory().openSession()) {
+        Session session = null;
+        try {
+            session = SessionFactoryUtil.getSessionFactory().openSession();
             transaction = session.beginTransaction();
 
             Customer customer = session.find(Customer.class, id);
@@ -81,6 +106,10 @@ public class CustomerDao {
         } catch (Exception e) {
             if (transaction != null) transaction.rollback();
             throw new DAOException("Failed to delete customer: " + e.getMessage());
+        } finally {
+            if(session != null && session.isOpen()){
+                session.close();
+            }
         }
     }
 }

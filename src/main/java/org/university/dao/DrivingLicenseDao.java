@@ -11,7 +11,9 @@ import java.util.List;
 public class DrivingLicenseDao {
     public void createDrivingLicense(DrivingLicense drivingLicense) throws DAOException {
         Transaction transaction = null;
-        try (Session session = SessionFactoryUtil.getSessionFactory().openSession()) {
+        Session session = null;
+        try {
+        session = SessionFactoryUtil.getSessionFactory().openSession();
             transaction = session.beginTransaction();
             session.persist(drivingLicense);
             transaction.commit();
@@ -20,25 +22,43 @@ public class DrivingLicenseDao {
                 transaction.rollback();
             }
             throw new DAOException("Failed to create driving license: " + e.getMessage());
+        }finally {
+            if(session != null && session.isOpen()){
+                session.close();
+            }
         }
     }
 
     public DrivingLicense getDrivingLicenseById(long id) {
-        try (Session session = SessionFactoryUtil.getSessionFactory().openSession()) {
+        Session session = null;
+        try {
+            session = SessionFactoryUtil.getSessionFactory().openSession();
             return session.find(DrivingLicense.class, id);
+        }finally {
+            if(session != null && session.isOpen()){
+                session.close();
+            }
         }
     }
 
     public List<DrivingLicense> getAllDrivingLicenses() {
-        try (Session session = SessionFactoryUtil.getSessionFactory().openSession()) {
+        Session session = null;
+        try {
+            session = SessionFactoryUtil.getSessionFactory().openSession();
             return session.createQuery("SELECT d FROM DrivingLicense d", DrivingLicense.class)
                     .getResultList();
+        }finally {
+            if(session != null && session.isOpen()){
+                session.close();
+            }
         }
     }
 
     public void updateDrivingLicense(long id, DrivingLicense updated) throws DAOException {
         Transaction transaction = null;
-        try (Session session = SessionFactoryUtil.getSessionFactory().openSession()) {
+        Session session = null;
+        try {
+            session = SessionFactoryUtil.getSessionFactory().openSession();
             transaction = session.beginTransaction();
 
             DrivingLicense drivingLicense = session.find(DrivingLicense.class, id);
@@ -62,12 +82,18 @@ public class DrivingLicenseDao {
                 transaction.rollback();
             }
             throw new DAOException("Failed to update driving license: " + e.getMessage());
+        }finally {
+            if(session != null && session.isOpen()){
+                session.close();
+            }
         }
     }
 
     public void deleteDrivingLicense(long id) throws DAOException {
         Transaction transaction = null;
-        try (Session session = SessionFactoryUtil.getSessionFactory().openSession()) {
+        Session session = null;
+        try{
+            session = SessionFactoryUtil.getSessionFactory().openSession();
             transaction = session.beginTransaction();
 
             DrivingLicense drivingLicense = session.find(DrivingLicense.class, id);
@@ -87,6 +113,10 @@ public class DrivingLicenseDao {
                 transaction.rollback();
             }
             throw new DAOException("Failed to delete driving license: " + e.getMessage());
+        }finally {
+            if(session != null && session.isOpen()){
+                session.close();
+            }
         }
     }
 }

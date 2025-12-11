@@ -7,6 +7,7 @@ import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.PositiveOrZero;
 import lombok.*;
 import org.university.util.CargoType;
+import org.university.util.PaymentStatus;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -55,8 +56,9 @@ public class Transport extends BaseEntity {
     @ToString.Exclude
     private Customer customer;
 
-    @Column(name = "paid")
-    private boolean paid;
+    @Enumerated(EnumType.STRING)
+    @Column(name = "paymentStatus")
+    private PaymentStatus paymentStatus = PaymentStatus.NOT_PAID;
 
     @NotNull
     @Positive
@@ -71,7 +73,7 @@ public class Transport extends BaseEntity {
     @NotNull
     @PositiveOrZero
     @Column(name = "price")
-    private BigDecimal totalPrice;
+    private BigDecimal totalPrice = BigDecimal.ZERO;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "vehicle_id")

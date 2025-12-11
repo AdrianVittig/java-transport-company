@@ -10,8 +10,10 @@ import java.util.List;
 
 public class IdentificationCardDao {
     public void createIdentificationCard(IdentificationCard card) throws DAOException {
+        Session session = null;
         Transaction transaction = null;
-        try (Session session = SessionFactoryUtil.getSessionFactory().openSession()) {
+        try {
+            session = SessionFactoryUtil.getSessionFactory().openSession();
             transaction = session.beginTransaction();
             session.persist(card);
             transaction.commit();
@@ -20,26 +22,43 @@ public class IdentificationCardDao {
                 transaction.rollback();
             }
             throw new DAOException("Failed to create identification card: " + e.getMessage());
+        }finally {
+            if(session != null && session.isOpen()){
+                session.close();
+            }
         }
     }
 
     public IdentificationCard getIdentificationCardById(long id) {
-        try (Session session = SessionFactoryUtil.getSessionFactory().openSession()) {
+        Session session = null;
+        try {
+            session = SessionFactoryUtil.getSessionFactory().openSession();
             return session.find(IdentificationCard.class, id);
+        }finally {
+            if(session != null && session.isOpen()){
+                session.close();
+            }
         }
     }
 
     public List<IdentificationCard> getAllIdentificationCards() {
-        try (Session session = SessionFactoryUtil.getSessionFactory().openSession()) {
+        Session session = null;
+        try {
+            session = SessionFactoryUtil.getSessionFactory().openSession();
             return session.createQuery("SELECT i FROM IdentificationCard i", IdentificationCard.class)
                     .getResultList();
+        }finally {
+            if(session != null && session.isOpen()){
+                session.close();
+            }
         }
     }
 
     public void updateIdentificationCard(long id, IdentificationCard updated) throws DAOException {
         Transaction transaction = null;
-
-        try (Session session = SessionFactoryUtil.getSessionFactory().openSession()) {
+        Session session = null;
+        try {
+            session = SessionFactoryUtil.getSessionFactory().openSession();
             transaction = session.beginTransaction();
 
             IdentificationCard card = session.find(IdentificationCard.class, id);
@@ -63,13 +82,18 @@ public class IdentificationCardDao {
                 transaction.rollback();
             }
             throw new DAOException("Failed to update identification card: " + e.getMessage());
+        }finally {
+            if(session != null && session.isOpen()){
+                session.close();
+            }
         }
     }
 
     public void deleteIdentificationCard(long id) throws DAOException {
         Transaction transaction = null;
-
-        try (Session session = SessionFactoryUtil.getSessionFactory().openSession()) {
+        Session session = null;
+        try {
+            session = SessionFactoryUtil.getSessionFactory().openSession();
             transaction = session.beginTransaction();
 
             IdentificationCard card = session.find(IdentificationCard.class, id);
@@ -90,6 +114,10 @@ public class IdentificationCardDao {
                 transaction.rollback();
             }
             throw new DAOException("Failed to delete identification card: " + e.getMessage());
+        }finally {
+            if(session != null && session.isOpen()){
+                session.close();
+            }
         }
     }
 }

@@ -12,7 +12,9 @@ public class VehicleDao
 {
     public void createVehicle(Vehicle vehicle) throws DAOException {
         Transaction transaction = null;
-        try (Session session = SessionFactoryUtil.getSessionFactory().openSession()) {
+        Session session = null;
+        try {
+            session = SessionFactoryUtil.getSessionFactory().openSession();
             transaction = session.beginTransaction();
             session.persist(vehicle);
             transaction.commit();
@@ -21,26 +23,43 @@ public class VehicleDao
                 transaction.rollback();
             }
             throw new DAOException("Failed to create vehicle: " + e.getMessage());
+        }finally {
+            if(session != null && session.isOpen()){
+                session.close();
+            }
         }
     }
 
     public Vehicle getVehicleById(long id) {
-        try (Session session = SessionFactoryUtil.getSessionFactory().openSession()) {
+        Session session = null;
+        try {
+            session = SessionFactoryUtil.getSessionFactory().openSession();
             return session.find(Vehicle.class, id);
+        }finally {
+            if(session != null && session.isOpen()){
+                session.close();
+            }
         }
     }
 
     public List<Vehicle> getAllVehicles() {
-        try (Session session = SessionFactoryUtil.getSessionFactory().openSession()) {
+        Session session = null;
+        try {
+            session = SessionFactoryUtil.getSessionFactory().openSession();
             return session.createQuery("SELECT v FROM Vehicle v", Vehicle.class)
                     .getResultList();
+        }finally {
+            if(session != null && session.isOpen()){
+                session.close();
+            }
         }
     }
 
     public void updateVehicle(long id, Vehicle updated) throws DAOException {
         Transaction transaction = null;
-
-        try (Session session = SessionFactoryUtil.getSessionFactory().openSession()) {
+        Session session = null;
+        try {
+            session = SessionFactoryUtil.getSessionFactory().openSession();
             transaction = session.beginTransaction();
 
             Vehicle v = session.find(Vehicle.class, id);
@@ -64,13 +83,18 @@ public class VehicleDao
                 transaction.rollback();
             }
             throw new DAOException("Failed to update vehicle: " + e.getMessage());
+        }finally {
+            if(session != null && session.isOpen()){
+                session.close();
+            }
         }
     }
 
     public void deleteVehicle(long id) throws DAOException {
         Transaction transaction = null;
-
-        try (Session session = SessionFactoryUtil.getSessionFactory().openSession()) {
+        Session session = null;
+        try {
+            session = SessionFactoryUtil.getSessionFactory().openSession();
             transaction = session.beginTransaction();
 
             Vehicle vehicle = session.find(Vehicle.class, id);
@@ -91,6 +115,10 @@ public class VehicleDao
                 transaction.rollback();
             }
             throw new DAOException("Failed to delete vehicle: " + e.getMessage());
+        }finally {
+            if(session != null && session.isOpen()){
+                session.close();
+            }
         }
     }
 }

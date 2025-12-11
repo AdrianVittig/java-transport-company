@@ -9,6 +9,10 @@ repositories {
     mavenCentral()
 }
 
+tasks.withType<JavaExec> {
+    isIgnoreExitValue = true
+}
+
 dependencies {
     implementation("org.hibernate.orm:hibernate-core:7.1.0.Final")
     implementation("com.mysql:mysql-connector-j:9.4.0")

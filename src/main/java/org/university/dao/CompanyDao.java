@@ -19,33 +19,54 @@ import java.util.stream.Collectors;
 public class CompanyDao {
     public void createCompany(Company company) throws DAOException {
         Transaction transaction = null;
-        try(Session session = SessionFactoryUtil.getSessionFactory().openSession()){
+        Session session = null;
+        try{
+            session = SessionFactoryUtil.getSessionFactory().openSession();
             transaction = session.beginTransaction();
             session.persist(company);
             transaction.commit();
-        }catch(Exception e){
-            if(transaction != null){
+        }catch (Exception e) {
+            if (transaction != null && transaction.isActive()) {
                 transaction.rollback();
             }
             throw new DAOException("Failed to create company: " + e.getMessage());
+        } finally {
+            if (session != null && session.isOpen()) {
+                session.close();
+            }
         }
     }
 
     public Company getCompanyById(long id){
-        try(Session session = SessionFactoryUtil.getSessionFactory().openSession()){
+        Session session = null;
+        try{
+            session = SessionFactoryUtil.getSessionFactory().openSession();
             return session.find(Company.class,id);
+        }finally {
+            if(session != null && session.isOpen()){
+                session.close();
+            }
         }
     }
 
     public List<Company> getAllCompanies(){
-        try(Session session = SessionFactoryUtil.getSessionFactory().openSession()){
+        Session session = null;
+        try{
+            session = SessionFactoryUtil.getSessionFactory().openSession();
             return session.createQuery("SELECT c FROM Company c", Company.class).getResultList();
+        }finally {
+            if(session != null && session.isOpen()){
+                session.close();
+            }
         }
+
     }
 
     public void updateCompany(long id, Company company) throws DAOException {
         Transaction transaction = null;
-        try(Session session = SessionFactoryUtil.getSessionFactory().openSession()){
+        Session session = null;
+        try{
+            session = SessionFactoryUtil.getSessionFactory().openSession();
             transaction = session.beginTransaction();
             Company companyToUpdate = session.find(Company.class,id);
             if(companyToUpdate == null){
@@ -65,12 +86,18 @@ public class CompanyDao {
                 transaction.rollback();
             }
             throw new DAOException("Failed to update company: " + e.getMessage());
+        }finally {
+            if(session != null && session.isOpen()){
+                session.close();
+            }
         }
     }
 
     public void deleteCompany(long id) throws DAOException {
         Transaction transaction = null;
-        try(Session session = SessionFactoryUtil.getSessionFactory().openSession()){
+        Session session = null;
+        try{
+            session = SessionFactoryUtil.getSessionFactory().openSession();
             transaction = session.beginTransaction();
             Company companyToDelete = session.find(Company.class,id);
             if(companyToDelete == null){
@@ -89,11 +116,17 @@ public class CompanyDao {
                 transaction.rollback();
             }
             throw new DAOException("Failed to delete company: " + e.getMessage());
+        }finally {
+            if(session != null && session.isOpen()){
+                session.close();
+            }
         }
     }
 
     public List<CompanyEmployeeDto> getCompanyWithEmployees(long id) {
-        try (Session session = SessionFactoryUtil.getSessionFactory().openSession()) {
+        Session session = null;
+        try{
+            session = SessionFactoryUtil.getSessionFactory().openSession();
             return session.createQuery(
                             "SELECT new org.university.dto.CompanyEmployeeDto(" +
                                     "c.id, c.name, e.id, e.firstName, e.lastName) " +
@@ -104,11 +137,17 @@ public class CompanyDao {
                     )
                     .setParameter("id", id)
                     .getResultList();
+        }finally {
+            if(session != null && session.isOpen()){
+                session.close();
+            }
         }
     }
 
     public CompanyEmployeesDto getCompanyWithEmployeesFetch(long id) {
-        try (Session session = SessionFactoryUtil.getSessionFactory().openSession()) {
+        Session session = null;
+        try{
+            session = SessionFactoryUtil.getSessionFactory().openSession();
             Company company = session.createQuery(
                             "SELECT c FROM Company c " +
                                     "JOIN FETCH c.employeeSet " +
@@ -142,12 +181,18 @@ public class CompanyDao {
                     .collect(Collectors.toSet());
 
             return new CompanyEmployeesDto(company.getId(), company.getName(), employeeDtos);
+        }finally {
+            if(session != null && session.isOpen()){
+                session.close();
+            }
         }
     }
 
     public void createCompanyAndEmployee(Company company, Employee employee) throws DAOException {
+        Session session = null;
         Transaction transaction = null;
-        try(Session session = SessionFactoryUtil.getSessionFactory().openSession()){
+        try {
+        session = SessionFactoryUtil.getSessionFactory().openSession();
             transaction = session.beginTransaction();
 
             session.persist(company);
@@ -163,6 +208,10 @@ public class CompanyDao {
                 transaction.rollback();
             }
             throw new DAOException("Failed to create company and employee: " + e.getMessage());
+        }finally {
+            if(session != null && session.isOpen()){
+                session.close();
+            }
         }
     }
 }

@@ -11,7 +11,9 @@ import java.util.List;
 public class EmployeeDao {
     public void createEmployee(Employee employee) throws DAOException {
         Transaction transaction = null;
-        try (Session session = SessionFactoryUtil.getSessionFactory().openSession()) {
+        Session session = null;
+        try {
+            session = SessionFactoryUtil.getSessionFactory().openSession();
             transaction = session.beginTransaction();
             session.persist(employee);
             transaction.commit();
@@ -20,25 +22,43 @@ public class EmployeeDao {
                 transaction.rollback();
             }
             throw new DAOException("Failed to create employee: " + e.getMessage());
+        }finally {
+            if(session != null && session.isOpen()){
+                session.close();
+            }
         }
     }
 
     public Employee getEmployeeById(long id) {
-        try (Session session = SessionFactoryUtil.getSessionFactory().openSession()) {
+        Session session = null;
+        try{
+            session = SessionFactoryUtil.getSessionFactory().openSession();
             return session.find(Employee.class, id);
-        }
+        }finally {
+                if(session != null && session.isOpen()){
+                    session.close();
+                }
+            }
     }
 
     public List<Employee> getAllEmployees() {
-        try (Session session = SessionFactoryUtil.getSessionFactory().openSession()) {
+        Session session = null;
+        try{
+            session = SessionFactoryUtil.getSessionFactory().openSession();
             return session.createQuery("SELECT e FROM Employee e", Employee.class)
                     .getResultList();
+        }finally {
+            if(session != null && session.isOpen()){
+                session.close();
+            }
         }
     }
 
     public void updateEmployee(long id, Employee updated) throws DAOException {
         Transaction transaction = null;
-        try (Session session = SessionFactoryUtil.getSessionFactory().openSession()) {
+        Session session = null;
+        try {
+            session = SessionFactoryUtil.getSessionFactory().openSession();
             transaction = session.beginTransaction();
 
             Employee employee = session.find(Employee.class, id);
@@ -65,12 +85,18 @@ public class EmployeeDao {
                 transaction.rollback();
             }
             throw new DAOException("Failed to update employee: " + e.getMessage());
+        }finally {
+            if(session != null && session.isOpen()){
+                session.close();
+            }
         }
     }
 
     public void deleteEmployee(long id) throws DAOException {
         Transaction transaction = null;
-        try (Session session = SessionFactoryUtil.getSessionFactory().openSession()) {
+        Session session = null;
+        try {
+            session = SessionFactoryUtil.getSessionFactory().openSession();
             transaction = session.beginTransaction();
 
             Employee employee = session.find(Employee.class, id);
@@ -90,6 +116,27 @@ public class EmployeeDao {
                 transaction.rollback();
             }
             throw new DAOException("Failed to delete employee: " + e.getMessage());
+        }finally {
+            if(session != null && session.isOpen()){
+                session.close();
+            }
+        }
+    }
+
+    public int countEmployeesByCompanyId(Long companyId){
+        Session session = null;
+        try{
+            session = SessionFactoryUtil.getSessionFactory().openSession();
+            Long count = session.createQuery(
+                    "SELECT COUNT(e) FROM Employee e WHERE e.company.id = :companyId",
+                    Long.class)
+                    .setParameter("companyId", companyId)
+                    .uniqueResult();
+            return count != null ? count.intValue() : 0;
+        }finally {
+            if(session != null && session.isOpen()){
+                session.close();
+            }
         }
     }
 }
