@@ -547,15 +547,14 @@ public class Runner {
             System.out.println("12) Pay single transport");
             System.out.println("13) Calculate customer debt");
             System.out.println("14) Get unpaid transport ids for customer");
-            System.out.println("15) Calculate and persist total price for transport");
-            System.out.println("16) Sort transports by destination ASC");
-            System.out.println("17) Report: transports count");
-            System.out.println("18) Report: total transport revenue");
-            System.out.println("19) Report: transports count by driver");
-            System.out.println("20) Report: company revenue for period");
-            System.out.println("21) Report: driver revenue");
-            System.out.println("22) Save transport to file");
-            System.out.println("23) Load transport from file");
+            System.out.println("15) Sort transports by destination ASC");
+            System.out.println("16) Report: transports count");
+            System.out.println("17) Report: total transport revenue");
+            System.out.println("18) Report: transports count by driver");
+            System.out.println("19) Report: company revenue for period");
+            System.out.println("20) Report: driver revenue");
+            System.out.println("21) Save transport to file");
+            System.out.println("22) Load transport from file");
             System.out.println("0) Back");
 
             String ch = readLine(sc, "Choice: ").trim();
@@ -678,47 +677,31 @@ public class Runner {
                     Long customerId = readLong(sc, "Customer id: ");
                     System.out.println("Unpaid transport ids: " + transport.getUnpaidTransportIdsForCustomer(customerId));
                 }
-                case "15" -> {
-                    Long id = readLong(sc, "Transport id: ");
-                    TransportDto dto = transport.getTransportById(id);
-
-                    Transport entity = new Transport();
-                    entity.setCargoType(dto.getCargoType());
-                    entity.setInitPrice(dto.getInitPrice());
-                    entity.setQuantity(dto.getQuantity());
-
-                    BigDecimal total = transport.calculateTotalPrice(entity);
-                    dto.setTotalPrice(total);
-                    dto.setPaymentStatus(entity.getPaymentStatus());
-
-                    transport.updateTransport(id, dto);
-                    System.out.println("Total price calculated and persisted. Total=" + total);
-                }
-                case "16" -> transport.sortTransportsByDestinationAscending(true).forEach(t ->
+                case "15" -> transport.sortTransportsByDestinationAscending(true).forEach(t ->
                         System.out.println("id=" + t.getId() + ", end=" + t.getEndPoint())
                 );
-                case "17" -> System.out.println("Transports count: " + transport.getTransportsCount());
-                case "18" -> System.out.println("Total transport revenue: " + transport.getTotalTransportRevenue());
-                case "19" -> {
+                case "16" -> System.out.println("Transports count: " + transport.getTransportsCount());
+                case "17" -> System.out.println("Total transport revenue: " + transport.getTotalTransportRevenue());
+                case "18" -> {
                     Map<Long, Integer> map = transport.getTransportsCountByDriver();
                     map.forEach((k, v) -> System.out.println("DriverId=" + k + " -> transports=" + v));
                 }
-                case "20" -> {
+                case "19" -> {
                     Long companyId = readLong(sc, "Company id: ");
                     LocalDate start = readDate(sc, "Start date (YYYY-MM-DD): ");
                     LocalDate end = readDate(sc, "End date (YYYY-MM-DD): ");
                     System.out.println("Company revenue for period: " + transport.getCompanyRevenueForAPeriod(companyId, start, end));
                 }
-                case "21" -> {
+                case "20" -> {
                     Map<Long, BigDecimal> map = transport.getDriverRevenue();
                     map.forEach((k, v) -> System.out.println("DriverId=" + k + " -> revenue=" + v));
                 }
-                case "22" -> {
+                case "21" -> {
                     Long id = readLong(sc, "Transport id: ");
                     fileService.saveTransport(id);
                     System.out.println("Transport saved to file.");
                 }
-                case "23" -> {
+                case "22" -> {
                     Long id = readLong(sc, "Transport id: ");
                     TransportDto dto = fileService.loadTransportsFromFile(id);
                     System.out.println("Loaded from file: id=" + dto.getId()

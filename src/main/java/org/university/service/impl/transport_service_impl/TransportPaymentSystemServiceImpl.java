@@ -22,7 +22,7 @@ public class TransportPaymentSystemServiceImpl implements TransportPaymentSystem
     }
 
     @Override
-    public void markTransportAsPaid(Long transportId) {
+    public void markTransportAsPaid(Long transportId) throws DAOException{
         Transport transport = transportDao.getTransportById(transportId);
         if (transport == null) {
             throw new DAOException("Transport with id " + transportId + " does not exist");
@@ -32,7 +32,17 @@ public class TransportPaymentSystemServiceImpl implements TransportPaymentSystem
             return;
         }
 
+        Customer customer = customerDao.getCustomerById(transport.getCustomer().getId());
+
+        BigDecimal budget = customer.getBudget() == null ? BigDecimal.ZERO : customer.getBudget();
+
+        if(budget.compareTo(transport.getTotalPrice()) < 0){
+            throw new DAOException("Customer budget is not enough to pay transport with id " + transportId);
+        }
+
+        customer.setBudget(budget.subtract(transport.getTotalPrice()));
         transportDao.updatePaymentStatus(transportId, PaymentStatus.PAID);
+        customerDao.updateCustomer(transport.getCustomer().getId(), customer);
     }
 
     @Override
