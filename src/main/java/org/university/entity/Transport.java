@@ -1,10 +1,7 @@
 package org.university.entity;
 
 import jakarta.persistence.*;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Positive;
-import jakarta.validation.constraints.PositiveOrZero;
+import jakarta.validation.constraints.*;
 import lombok.*;
 import org.university.util.CargoType;
 import org.university.util.PaymentStatus;
@@ -16,9 +13,9 @@ import java.time.LocalDate;
 @Table(name = "transport")
 @Getter
 @Setter
-@ToString
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
 public class Transport extends BaseEntity {
     @NotBlank
     @Column(name = "start_point")
@@ -43,21 +40,19 @@ public class Transport extends BaseEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "company_id")
-    @ToString.Exclude
     private Company company;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "employee_id")
-    @ToString.Exclude
     private Employee employee;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "customer_id")
-    @ToString.Exclude
     private Customer customer;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "paymentStatus")
+    @Builder.Default
     private PaymentStatus paymentStatus = PaymentStatus.NOT_PAID;
 
     @NotNull
@@ -73,10 +68,16 @@ public class Transport extends BaseEntity {
     @NotNull
     @PositiveOrZero
     @Column(name = "price")
+    @Builder.Default
     private BigDecimal totalPrice = BigDecimal.ZERO;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "vehicle_id")
-    @ToString.Exclude
     private Vehicle vehicle;
+
+    @AssertTrue(message = "Arrival date must be after or equal to departure date")
+    private boolean isArrivalAfterDeparture() {
+        if (departureDate == null || arrivalDate == null) return true;
+        return !arrivalDate.isBefore(departureDate);
+    }
 }

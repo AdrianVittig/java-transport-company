@@ -13,9 +13,9 @@ import java.util.Set;
 @Table(name = "vehicle")
 @Getter
 @Setter
-@ToString
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
 public class Vehicle extends BaseEntity {
     @NotNull
     @Enumerated(EnumType.STRING)
@@ -25,19 +25,18 @@ public class Vehicle extends BaseEntity {
     @NotNull
     @PositiveOrZero
     @Column(name = "distance_traveled")
+    @Builder.Default
     private BigDecimal distanceTraveled = BigDecimal.ZERO;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "employee_id")
-    @ToString.Exclude
     private Employee employee;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "company_id")
-    @ToString.Exclude
     private Company company;
 
     @OneToMany(mappedBy = "vehicle")
-    @ToString.Exclude
+    @Builder.Default
     private Set<Transport> transportSet = new HashSet<>();
 }

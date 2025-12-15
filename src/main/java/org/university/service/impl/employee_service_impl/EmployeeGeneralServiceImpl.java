@@ -30,7 +30,7 @@ public class EmployeeGeneralServiceImpl implements EmployeeGeneralService {
 
     @Override
     public EmployeeDto mapToDto(Employee employee) {
-        return mapToDto(employee);
+        return crud.mapToDto(employee);
     }
 
     @Override
@@ -89,23 +89,13 @@ public class EmployeeGeneralServiceImpl implements EmployeeGeneralService {
     }
 
     @Override
-    public List<Employee> sortEmployeesBySalaryAscending() {
-        return sorting.sortEmployeesBySalaryAscending();
+    public List<Employee> sortEmployeesBySalaryAscending(boolean isAscending) {
+        return sorting.sortEmployeesBySalaryAscending(isAscending);
     }
 
     @Override
-    public List<Employee> sortEmployeesBySalaryDescending() {
-        return sorting.sortEmployeesBySalaryDescending();
-    }
-
-    @Override
-    public List<Employee> sortEmployeesByQualificationAscending() {
-        return sorting.sortEmployeesByQualificationAscending();
-    }
-
-    @Override
-    public List<Employee> sortEmployeesByQualificationDescending() {
-        return sorting.sortEmployeesByQualificationDescending();
+    public List<Employee> sortEmployeesByQualificationAscending(boolean isAscending) {
+        return sorting.sortEmployeesByQualificationAscending(isAscending);
     }
 
     @Override

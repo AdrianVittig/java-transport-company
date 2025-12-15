@@ -6,6 +6,7 @@ import org.university.entity.Customer;
 import org.university.entity.Transport;
 import org.university.exception.DAOException;
 import org.university.service.contract.customer_service.CustomerReportService;
+import org.university.util.PaymentStatus;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -23,31 +24,24 @@ public class CustomerReportServiceImpl implements CustomerReportService {
     @Override
     public BigDecimal getCustomerTotalSpent(Long customerId) throws DAOException {
         Customer customer = customerDao.getCustomerById(customerId);
-        if(customer == null){
-            throw new DAOException("Customer with id " + customerId + " does not exist");
-        }
-        BigDecimal totalSpent = BigDecimal.ZERO;
-        if(customer.getTransportSet() == null){
-            return BigDecimal.ZERO;
-        }
-        for(Transport transport : customer.getTransportSet()){
-            BigDecimal price = transport.getTotalPrice();
-            if(price == null){
-                price = BigDecimal.ZERO;
-            }
-            totalSpent = totalSpent.add(price);
-        }
-        return totalSpent;
+        if (customer == null) throw new DAOException("Customer with id " + customerId + " does not exist");
+
+        return transportDao.getAllTransports().stream()
+                .filter(t -> t.getCustomer() != null && customerId.equals(t.getCustomer().getId()))
+                .filter(t -> t.getPaymentStatus() == PaymentStatus.PAID)
+                .map(t -> t.getTotalPrice() != null ? t.getTotalPrice() : BigDecimal.ZERO)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
     }
 
     @Override
-    public int getCustomerTransportsCount(Long customerId) {
+    public int getCustomerTransportsCount(Long customerId) throws DAOException {
         Customer customer = customerDao.getCustomerById(customerId);
-        if(customer == null){
-            throw new DAOException("Customer with id " + customerId + " does not exist");
-        }
+        if (customer == null) throw new DAOException("Customer with id " + customerId + " does not exist");
 
-        return customer.getTransportSet() != null ? customer.getTransportSet().size() : 0;
+        return (int) transportDao.getAllTransports().stream()
+                .filter(t -> t.getCustomer() != null && customerId.equals(t.getCustomer().getId()))
+                .filter(t -> t.getPaymentStatus() == PaymentStatus.PAID)
+                .count();
     }
 
     @Override
@@ -73,6 +67,6 @@ public class CustomerReportServiceImpl implements CustomerReportService {
                 ? transport.getTotalPrice() : BigDecimal.ZERO)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
 
-        return total.divide(BigDecimal.valueOf(transportList.size()), RoundingMode.HALF_UP);
+        return total.divide(BigDecimal.valueOf(transportList.size()),2, RoundingMode.HALF_UP);
     }
 }

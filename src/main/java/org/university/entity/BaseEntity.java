@@ -6,7 +6,6 @@ import lombok.*;
 @MappedSuperclass
 @Getter
 @Setter
-@ToString
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @NoArgsConstructor
 @AllArgsConstructor

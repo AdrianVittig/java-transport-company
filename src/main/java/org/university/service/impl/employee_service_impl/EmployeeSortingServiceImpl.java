@@ -1,15 +1,10 @@
 package org.university.service.impl.employee_service_impl;
 
 import org.university.dao.EmployeeDao;
-import org.university.entity.Company;
 import org.university.entity.Employee;
 import org.university.service.contract.employee_service.EmployeeSortingService;
-import org.university.util.DriverQualifications;
 
-import java.math.BigDecimal;
-import java.util.Comparator;
 import java.util.List;
-import java.util.Set;
 
 public class EmployeeSortingServiceImpl implements EmployeeSortingService {
     private final EmployeeDao employeeDao;
@@ -32,42 +27,13 @@ public class EmployeeSortingServiceImpl implements EmployeeSortingService {
     }
 
     @Override
-    public List<Employee> sortEmployeesBySalaryAscending() {
-        return employeeDao.getAllEmployees()
-                .stream()
-                .sorted(Comparator.comparing(employee -> {
-                    BigDecimal employeeSalary = employee.getSalary();
-                    return employeeSalary != null ? employeeSalary : BigDecimal.ZERO;
-                }))
-                .toList();
+    public List<Employee> sortEmployeesBySalaryAscending(boolean isAscending) {
+        return employeeDao.sortEmployeesBySalary(isAscending);
     }
 
     @Override
-    public List<Employee> sortEmployeesBySalaryDescending() {
-        return employeeDao.getAllEmployees()
-                .stream()
-                .sorted(
-                        Comparator.comparing((Employee e) -> {
-                            BigDecimal employeeSalary = e.getSalary();
-                            return employeeSalary != null ? employeeSalary : BigDecimal.ZERO;
-                        }).reversed()
-                )
-                .toList();
+    public List<Employee> sortEmployeesByQualificationAscending(boolean isAscending) {
+        return employeeDao.sortEmployeesByQualification(isAscending);
     }
 
-    @Override
-    public List<Employee> sortEmployeesByQualificationAscending() {
-        return employeeDao.getAllEmployees()
-                .stream()
-                .sorted(Comparator.comparingInt(this::getQualificationIndex))
-                .toList();
-    }
-
-    @Override
-    public List<Employee> sortEmployeesByQualificationDescending() {
-        return employeeDao.getAllEmployees()
-                .stream()
-                .sorted(Comparator.comparingInt(this::getQualificationIndex).reversed())
-                .toList();
-    }
 }

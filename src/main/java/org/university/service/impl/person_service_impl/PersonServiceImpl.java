@@ -26,7 +26,6 @@ public class PersonServiceImpl implements PersonService {
         person.setFirstName(personDto.getFirstName());
         person.setLastName(personDto.getLastName());
         person.setBirthDate(personDto.getBirthDate());
-
         return person;
     }
 
@@ -38,7 +37,7 @@ public class PersonServiceImpl implements PersonService {
         personDto.setLastName(person.getLastName());
         personDto.setBirthDate(person.getBirthDate());
 
-        if(person.getIdentificationCard() != null){
+        if (person.getIdentificationCard() != null) {
             personDto.setIdentificationCardId(person.getIdentificationCard().getId());
         }
         return personDto;
@@ -54,7 +53,7 @@ public class PersonServiceImpl implements PersonService {
     @Override
     public PersonDto getPersonById(Long id) throws DAOException {
         Person person = personDao.getPersonById(id);
-        if(person == null) {
+        if (person == null) {
             throw new DAOException("Person with id " + id + " does not exist");
         }
         return mapToDto(person);
@@ -71,35 +70,47 @@ public class PersonServiceImpl implements PersonService {
     @Override
     public PersonDto updatePerson(Long id, PersonDto personDto) throws DAOException {
         Person person = personDao.getPersonById(id);
-        if(person == null) {
+        if (person == null) {
             throw new DAOException("Person with id " + id + " does not exist");
         }
+
         person.setFirstName(personDto.getFirstName());
         person.setLastName(personDto.getLastName());
         person.setBirthDate(personDto.getBirthDate());
 
-        if(personDto.getIdentificationCardId() != null){
-            IdentificationCard identificationCard = identificationCardDao.getIdentificationCardById(personDto.getIdentificationCardId());
-            if(identificationCard == null){
-                throw new DAOException("Identification card with id " + personDto.getIdentificationCardId() + " does not exist");
-            }
+        Long newCardId = personDto.getIdentificationCardId();
 
-            if(identificationCard.getPerson() != null && !identificationCard.getPerson().getId().equals(id)){
-                throw new DAOException("Identification card with id " + personDto.getIdentificationCardId() + " is already assigned to another person");
-            }
-
-            if(person.getIdentificationCard() != null){
-                person.getIdentificationCard().setPerson(null);
-            }
-            person.setIdentificationCard(identificationCard);
-            identificationCard.setPerson(person);
-        }
-        else{
-            if(person.getIdentificationCard() != null){
-                person.getIdentificationCard().setPerson(null);
+        if (newCardId == null) {
+            if (person.getIdentificationCard() != null) {
+                IdentificationCard oldCard = person.getIdentificationCard();
+                oldCard.setPerson(null);
                 person.setIdentificationCard(null);
+                identificationCardDao.updateIdentificationCard(oldCard.getId(), oldCard);
             }
+
+            personDao.updatePerson(id, person);
+            return mapToDto(person);
         }
+
+        IdentificationCard newCard = identificationCardDao.getIdentificationCardById(newCardId);
+        if (newCard == null) {
+            throw new DAOException("Identification card with id " + newCardId + " does not exist");
+        }
+
+        if (newCard.getPerson() != null && !newCard.getPerson().getId().equals(id)) {
+            throw new DAOException("Identification card with id " + newCardId + " is already assigned to another person");
+        }
+
+        if (person.getIdentificationCard() != null && !person.getIdentificationCard().getId().equals(newCardId)) {
+            IdentificationCard oldCard = person.getIdentificationCard();
+            oldCard.setPerson(null);
+            identificationCardDao.updateIdentificationCard(oldCard.getId(), oldCard);
+        }
+
+        person.setIdentificationCard(newCard);
+        newCard.setPerson(person);
+        identificationCardDao.updateIdentificationCard(newCard.getId(), newCard);
+
         personDao.updatePerson(id, person);
         return mapToDto(person);
     }
@@ -107,27 +118,28 @@ public class PersonServiceImpl implements PersonService {
     @Override
     public void deletePerson(Long id) throws DAOException {
         Person person = personDao.getPersonById(id);
-        if(person == null) {
+        if (person == null) {
             throw new DAOException("Person with id " + id + " does not exist");
         }
 
-        if(person.getIdentificationCard() != null){
+        if (person.getIdentificationCard() != null) {
             IdentificationCard identificationCard = person.getIdentificationCard();
             identificationCard.setPerson(null);
             identificationCardDao.updateIdentificationCard(identificationCard.getId(), identificationCard);
             person.setIdentificationCard(null);
         }
+
         personDao.deletePerson(id);
     }
 
     @Override
     public Long getIdentificationCardIdForPerson(Long personId) throws DAOException {
         Person person = personDao.getPersonById(personId);
-        if(person == null){
+        if (person == null) {
             throw new DAOException("Person with id " + personId + " does not exist");
         }
         IdentificationCard identificationCard = person.getIdentificationCard();
-        if(identificationCard == null){
+        if (identificationCard == null) {
             throw new DAOException("Person with id " + personId + " does not have an identification card");
         }
         return identificationCard.getId();

@@ -5,7 +5,6 @@ import lombok.*;
 @AllArgsConstructor
 @Getter
 @Setter
-@ToString
 @NoArgsConstructor
 public class CompanyEmployeeDto {
     private long companyId;

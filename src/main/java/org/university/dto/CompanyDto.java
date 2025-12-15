@@ -6,9 +6,9 @@ import java.math.BigDecimal;
 
 @Getter
 @Setter
-@ToString
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
 public class CompanyDto {
     private Long id;
     private String name;

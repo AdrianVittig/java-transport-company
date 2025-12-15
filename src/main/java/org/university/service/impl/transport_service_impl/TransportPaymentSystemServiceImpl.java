@@ -24,22 +24,21 @@ public class TransportPaymentSystemServiceImpl implements TransportPaymentSystem
     @Override
     public void markTransportAsPaid(Long transportId) {
         Transport transport = transportDao.getTransportById(transportId);
-        if(transport == null){
+        if (transport == null) {
             throw new DAOException("Transport with id " + transportId + " does not exist");
         }
 
-        if(transport.getPaymentStatus() == PaymentStatus.PAID){
+        if (transport.getPaymentStatus() == PaymentStatus.PAID) {
             return;
         }
 
-        transport.setPaymentStatus(PaymentStatus.PAID);
-        transportDao.updateTransport(transport.getId(), transport);
+        transportDao.updatePaymentStatus(transportId, PaymentStatus.PAID);
     }
 
     @Override
-    public BigDecimal calculateCustomerDebt(Long customerId) throws DAOException{
+    public BigDecimal calculateCustomerDebt(Long customerId) throws DAOException {
         Customer customer = customerDao.getCustomerById(customerId);
-        if(customer == null){
+        if (customer == null) {
             throw new DAOException("Customer with id " + customerId + " does not exist");
         }
 
@@ -53,20 +52,21 @@ public class TransportPaymentSystemServiceImpl implements TransportPaymentSystem
     }
 
     @Override
-    public void paySingleTransport(Long transportId) throws DAOException{
+    public void paySingleTransport(Long transportId) throws DAOException {
         Transport transport = transportDao.getTransportById(transportId);
-        if(transport == null){
+        if (transport == null) {
             throw new DAOException("Transport with id " + transportId + " does not exist");
         }
         markTransportAsPaid(transportId);
     }
 
     @Override
-    public Set<Long> getUnpaidTransportIdsForCustomer(Long customerId) throws DAOException{
+    public Set<Long> getUnpaidTransportIdsForCustomer(Long customerId) throws DAOException {
         Customer customer = customerDao.getCustomerById(customerId);
-        if(customer == null){
+        if (customer == null) {
             throw new DAOException("Customer with id " + customerId + " does not exist");
         }
+
         return transportDao.getAllTransports()
                 .stream()
                 .filter(transport -> transport.getCustomer() != null

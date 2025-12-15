@@ -1,11 +1,9 @@
 package org.university.service.impl.transport_service_impl;
 
-import org.university.dao.TransportDao;
 import org.university.dto.TransportDto;
 import org.university.entity.Transport;
 import org.university.exception.DAOException;
 import org.university.service.contract.transport_service.*;
-import org.university.util.PaymentStatus;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -43,8 +41,7 @@ public class TransportGeneralServiceImpl implements TransportGeneralService {
 
     @Override
     public TransportDto createTransport(TransportDto transportDto) {
-        crud.createTransport(transportDto);
-        return transportDto;
+        return crud.createTransport(transportDto);
     }
 
     @Override
@@ -120,13 +117,8 @@ public class TransportGeneralServiceImpl implements TransportGeneralService {
     }
 
     @Override
-    public List<Transport> sortTransportsByDestinationAscending() {
-        return sorting.sortTransportsByDestinationAscending();
-    }
-
-    @Override
-    public List<Transport> sortTransportsByDestinationDescending() {
-        return sorting.sortTransportsByDestinationDescending();
+    public List<Transport> sortTransportsByDestinationAscending(boolean isAscending) {
+        return sorting.sortTransportsByDestinationAscending(isAscending);
     }
 
     @Override

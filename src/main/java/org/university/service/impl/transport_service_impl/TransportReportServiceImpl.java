@@ -6,6 +6,7 @@ import org.university.entity.Company;
 import org.university.entity.Transport;
 import org.university.exception.DAOException;
 import org.university.service.contract.transport_service.TransportReportService;
+import org.university.util.PaymentStatus;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -31,6 +32,7 @@ public class TransportReportServiceImpl implements TransportReportService {
     public BigDecimal getTotalTransportRevenue() {
         return transportDao.getAllTransports()
                 .stream()
+                .filter(t -> t.getPaymentStatus() == PaymentStatus.PAID)
                 .map(transport -> {
                     BigDecimal price = transport.getTotalPrice();
                     return price != null ? price : BigDecimal.ZERO;
@@ -62,7 +64,9 @@ public class TransportReportServiceImpl implements TransportReportService {
 
         return transportDao.getAllTransports()
                 .stream()
-                .filter(transport -> transport.getCompany().getId().equals(companyId))
+                .filter(transport -> transport.getCompany() != null
+                && transport.getCompany().getId().equals(companyId))
+                .filter(t -> t.getPaymentStatus() == PaymentStatus.PAID)
                 .filter(transport -> {
                     LocalDate transportDate = transport.getDepartureDate();
                     return transportDate != null
@@ -80,7 +84,9 @@ public class TransportReportServiceImpl implements TransportReportService {
     public Map<Long, BigDecimal> getDriverRevenue() {
         Map<Long, BigDecimal> result = new HashMap<>();
         for(Transport transport : transportDao.getAllTransports()){
-            if(transport.getEmployee() == null || transport.getEmployee().getId() == null){
+            if(transport.getEmployee() == null
+                    || transport.getEmployee().getId() == null
+                    || transport.getPaymentStatus() != PaymentStatus.PAID){
                 continue;
             }
             Long driverId = transport.getEmployee().getId();

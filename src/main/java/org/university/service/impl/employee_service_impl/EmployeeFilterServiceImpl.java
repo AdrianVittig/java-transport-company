@@ -7,8 +7,6 @@ import org.university.util.DriverQualifications;
 
 import java.math.BigDecimal;
 import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 public class EmployeeFilterServiceImpl implements EmployeeFilterService {
     private final EmployeeDao employeeDao;
@@ -17,25 +15,11 @@ public class EmployeeFilterServiceImpl implements EmployeeFilterService {
     }
     @Override
     public List<Employee> filterEmployeeByQualification(DriverQualifications qualification) {
-        return employeeDao.getAllEmployees()
-                .stream()
-                .filter(employee -> {
-                    Set<DriverQualifications> employeeQualifications = employee.getDriverQualifications();
-                    return employeeQualifications != null && employeeQualifications.contains(qualification);
-                })
-                .collect(Collectors.toList());
+        return employeeDao.filterByQualification(qualification);
     }
 
     @Override
     public List<Employee> filterEmployeesBySalary(BigDecimal salary) {
-        return employeeDao.getAllEmployees()
-                .stream()
-                .filter(employee -> {
-                    if(employee.getSalary() == null){
-                        return false;
-                    }
-                    return employee.getSalary().compareTo(salary) >= 0;
-                })
-                .collect(Collectors.toList());
+        return employeeDao.filterByMinSalary(salary);
     }
 }

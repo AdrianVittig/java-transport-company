@@ -1,5 +1,9 @@
 package org.university.dao;
 
+import jakarta.persistence.criteria.CriteriaBuilder;
+import jakarta.persistence.criteria.CriteriaQuery;
+import jakarta.persistence.criteria.Predicate;
+import jakarta.persistence.criteria.Root;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.university.configuration.SessionFactoryUtil;
@@ -11,11 +15,12 @@ import org.university.entity.Employee;
 import org.university.entity.Transport;
 import org.university.entity.Vehicle;
 import org.university.exception.DAOException;
+import org.university.validators.ValidateNames;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
-
 public class CompanyDao {
     public void createCompany(Company company) throws DAOException {
         Transaction transaction = null;
@@ -214,4 +219,102 @@ public class CompanyDao {
             }
         }
     }
+
+    public List<Company> sortCompaniesByNameAscending(boolean ascending){
+        Session session = null;
+        try{
+            session = SessionFactoryUtil.getSessionFactory().openSession();
+            CriteriaBuilder criteriaBuilder = session.getCriteriaBuilder();
+            CriteriaQuery<Company> criteriaQuery = criteriaBuilder.createQuery(Company.class);
+            Root<Company> root = criteriaQuery.from(Company.class);
+
+            criteriaQuery.select(root).
+                    orderBy(ascending ?
+                            criteriaBuilder.asc(root.get("name")) : criteriaBuilder.desc(root.get("name")));
+
+            return session.createQuery(criteriaQuery).getResultList();
+        }catch(DAOException e){
+            throw e;
+        }catch(Exception e){
+            throw new DAOException("Failed to sort companies by name: " + e.getMessage());
+        }finally {
+            if(session != null && session.isOpen()){
+                session.close();
+            }
+        }
+    }
+
+    public List<Company> sortCompaniesByRevenue(boolean ascending){
+        Session session = null;
+        try{
+            session = SessionFactoryUtil.getSessionFactory().openSession();
+            CriteriaBuilder criteriaBuilder = session.getCriteriaBuilder();
+            CriteriaQuery<Company> criteriaQuery = criteriaBuilder.createQuery(Company.class);
+            Root<Company> root = criteriaQuery.from(Company.class);
+
+            criteriaQuery.select(root)
+                    .orderBy(ascending ?
+                            criteriaBuilder.asc(root.get("revenue")) : criteriaBuilder.desc(root.get("revenue")));
+
+            return session.createQuery(criteriaQuery).getResultList();
+        }catch(DAOException e){
+            throw e;
+        }catch(Exception e){
+            throw new DAOException("Failed to sort companies by revenue: " + e.getMessage());
+        }finally {
+            if(session != null && session.isOpen()){
+                session.close();
+            }
+        }
+    }
+
+    public List<Company> filterByName(String name){
+        Session session = null;
+        try{
+            session = SessionFactoryUtil.getSessionFactory().openSession();
+            CriteriaBuilder criteriaBuilder = session.getCriteriaBuilder();
+            CriteriaQuery<Company> criteriaQuery = criteriaBuilder.createQuery(Company.class);
+            Root<Company> root = criteriaQuery.from(Company.class);
+
+            Predicate nameEqualsTo = criteriaBuilder.like(
+                    criteriaBuilder.lower(root.get("name")), "%" + name.toLowerCase() + "%"
+            );
+
+            criteriaQuery.select(root).where(nameEqualsTo);
+            return session.createQuery(criteriaQuery).getResultList();
+        }catch(DAOException e){
+            throw e;
+        }catch(Exception e){
+            throw new DAOException("Failed to filter companies by name: " + e.getMessage());
+        }finally {
+            if(session != null && session.isOpen()){
+                session.close();
+            }
+        }
+    }
+
+    public List<Company> filterByRevenue(BigDecimal minRevenue){
+        Session session = null;
+        try{
+            session = SessionFactoryUtil.getSessionFactory().openSession();
+            CriteriaBuilder criteriaBuilder = session.getCriteriaBuilder();
+            CriteriaQuery<Company> criteriaQuery = criteriaBuilder.createQuery(Company.class);
+            Root<Company> root = criteriaQuery.from(Company.class);
+
+            criteriaQuery.select(root).
+                    where(criteriaBuilder.greaterThanOrEqualTo(root.get("revenue"), minRevenue));
+
+
+            return session.createQuery(criteriaQuery).getResultList();
+        }catch(DAOException e){
+            throw e;
+        }catch(Exception e){
+            throw new DAOException("Failed to filter companies by revenue: " + e.getMessage());
+        }finally {
+            if(session != null && session.isOpen()){
+                session.close();
+            }
+        }
+    }
+
 }

@@ -31,6 +31,9 @@ dependencies {
     implementation ("org.apache.logging.log4j:log4j-core:2.17.1")
     compileOnly("org.projectlombok:lombok:1.18.38")
     annotationProcessor("org.projectlombok:lombok:1.18.38")
+    testImplementation("org.junit.jupiter:junit-jupiter:5.10.0")
+    testImplementation("org.junit.jupiter:junit-jupiter:5.10.2")
+    testImplementation("org.mockito:mockito-junit-jupiter:5.12.0")
 }
 
 tasks.test {

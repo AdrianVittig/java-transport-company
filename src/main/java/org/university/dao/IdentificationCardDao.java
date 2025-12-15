@@ -4,6 +4,7 @@ import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.university.configuration.SessionFactoryUtil;
 import org.university.entity.IdentificationCard;
+import org.university.entity.Person;
 import org.university.exception.DAOException;
 
 import java.util.List;
@@ -18,12 +19,12 @@ public class IdentificationCardDao {
             session.persist(card);
             transaction.commit();
         } catch (Exception e) {
-            if (transaction != null) {
+            if (transaction != null && transaction.isActive()) {
                 transaction.rollback();
             }
             throw new DAOException("Failed to create identification card: " + e.getMessage());
-        }finally {
-            if(session != null && session.isOpen()){
+        } finally {
+            if (session != null && session.isOpen()) {
                 session.close();
             }
         }
@@ -34,8 +35,8 @@ public class IdentificationCardDao {
         try {
             session = SessionFactoryUtil.getSessionFactory().openSession();
             return session.find(IdentificationCard.class, id);
-        }finally {
-            if(session != null && session.isOpen()){
+        } finally {
+            if (session != null && session.isOpen()) {
                 session.close();
             }
         }
@@ -47,8 +48,8 @@ public class IdentificationCardDao {
             session = SessionFactoryUtil.getSessionFactory().openSession();
             return session.createQuery("SELECT i FROM IdentificationCard i", IdentificationCard.class)
                     .getResultList();
-        }finally {
-            if(session != null && session.isOpen()){
+        } finally {
+            if (session != null && session.isOpen()) {
                 session.close();
             }
         }
@@ -69,21 +70,23 @@ public class IdentificationCardDao {
             card.setCardNumber(updated.getCardNumber());
             card.setIssueDate(updated.getIssueDate());
             card.setExpiryDate(updated.getExpiryDate());
-            card.setPerson(updated.getPerson());
+
+            if (updated.getPerson() != null && updated.getPerson().getId() != null) {
+                Person managedPerson = session.getReference(Person.class, updated.getPerson().getId());
+                card.setPerson(managedPerson);
+            } else {
+                card.setPerson(null);
+            }
 
             transaction.commit();
         } catch (DAOException e) {
-            if (transaction != null) {
-                transaction.rollback();
-            }
+            if (transaction != null && transaction.isActive()) transaction.rollback();
             throw e;
         } catch (Exception e) {
-            if (transaction != null) {
-                transaction.rollback();
-            }
+            if (transaction != null && transaction.isActive()) transaction.rollback();
             throw new DAOException("Failed to update identification card: " + e.getMessage());
-        }finally {
-            if(session != null && session.isOpen()){
+        } finally {
+            if (session != null && session.isOpen()) {
                 session.close();
             }
         }
@@ -105,17 +108,13 @@ public class IdentificationCardDao {
 
             transaction.commit();
         } catch (DAOException e) {
-            if (transaction != null) {
-                transaction.rollback();
-            }
+            if (transaction != null && transaction.isActive()) transaction.rollback();
             throw e;
         } catch (Exception e) {
-            if (transaction != null) {
-                transaction.rollback();
-            }
+            if (transaction != null && transaction.isActive()) transaction.rollback();
             throw new DAOException("Failed to delete identification card: " + e.getMessage());
-        }finally {
-            if(session != null && session.isOpen()){
+        } finally {
+            if (session != null && session.isOpen()) {
                 session.close();
             }
         }

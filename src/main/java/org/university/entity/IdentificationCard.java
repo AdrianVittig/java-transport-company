@@ -10,9 +10,9 @@ import java.time.LocalDate;
 @Table(name = "identification_card")
 @Getter
 @Setter
-@ToString
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
 public class IdentificationCard extends BaseEntity {
     @NotBlank
     @Column(name = "card_number", unique = true)
@@ -28,6 +28,5 @@ public class IdentificationCard extends BaseEntity {
 
     @OneToOne(fetch = FetchType.LAZY, orphanRemoval = true)
     @JoinColumn(name = "person_id", unique = true)
-    @ToString.Exclude
     private Person person;
 }

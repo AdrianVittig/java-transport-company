@@ -13,9 +13,9 @@ import java.util.Set;
 @Table(name = "driving_license")
 @Getter
 @Setter
-@ToString
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
 public class DrivingLicense extends BaseEntity {
 
     @NotBlank
@@ -30,7 +30,7 @@ public class DrivingLicense extends BaseEntity {
     @Column(name = "expiry_date")
     private LocalDate expiryDate;
 
-    @ElementCollection(targetClass = DrivingLicenseCategories.class, fetch = FetchType.EAGER)
+    @ElementCollection(targetClass = DrivingLicenseCategories.class, fetch = FetchType.LAZY)
     @CollectionTable(
             name = "driving_license_categories",
             joinColumns = @JoinColumn(name = "driving_license_id")
@@ -40,6 +40,11 @@ public class DrivingLicense extends BaseEntity {
     private Set<DrivingLicenseCategories> drivingLicenseCategories = new HashSet<>();
 
     @OneToOne(mappedBy = "drivingLicense", fetch = FetchType.LAZY)
-    @ToString.Exclude
     private Employee employee;
+
+    @AssertTrue(message = "Expiry date must be after or equal to issue date")
+    private boolean isExpiryAfterIssue() {
+        if (issueDate == null || expiryDate == null) return true;
+        return !expiryDate.isBefore(issueDate);
+    }
 }

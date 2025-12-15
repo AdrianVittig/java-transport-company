@@ -53,20 +53,6 @@ public class EmployeeCRUDServiceImpl implements EmployeeCRUDService {
             employeeDto.setDrivingLicenseId(employee.getDrivingLicense().getId());
         }
 
-        if(employee.getVehicleSet() != null){
-            employeeDto.setVehicleIds(employee.getVehicleSet()
-                    .stream()
-                    .map(Vehicle::getId)
-                    .collect(Collectors.toSet()));
-        }
-
-        if(employee.getTransportSet() != null){
-            employeeDto.setTransportIds(
-                    employee.getTransportSet().stream()
-                            .map(Transport::getId)
-                            .collect(Collectors.toSet())
-            );
-        }
 
         return employeeDto;
     }

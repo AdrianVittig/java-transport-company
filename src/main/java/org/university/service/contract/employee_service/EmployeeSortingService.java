@@ -5,8 +5,6 @@ import org.university.entity.Employee;
 import java.util.List;
 
 public interface EmployeeSortingService {
-    List<Employee> sortEmployeesBySalaryAscending();
-    List<Employee> sortEmployeesBySalaryDescending();
-    List<Employee> sortEmployeesByQualificationAscending();
-    List<Employee> sortEmployeesByQualificationDescending();
+    List<Employee> sortEmployeesBySalaryAscending(boolean isAscending);
+    List<Employee> sortEmployeesByQualificationAscending(boolean isAscending);
 }

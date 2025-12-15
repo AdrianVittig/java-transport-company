@@ -64,6 +64,6 @@ public class VehicleReportServiceImpl implements VehicleReportService {
                     return price != null ? price : BigDecimal.ZERO;
                 })
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
-        return total.divide(BigDecimal.valueOf(transportList.size()), RoundingMode.HALF_UP);
+        return total.divide(BigDecimal.valueOf(transportList.size()), 2, RoundingMode.HALF_UP);
     }
 }

@@ -13,12 +13,11 @@ import java.util.Set;
 @Table(name = "employee")
 @Getter
 @Setter
-@ToString
 @NoArgsConstructor
 @AllArgsConstructor
 public class Employee extends Person {
 
-    @ElementCollection(targetClass = DriverQualifications.class, fetch = FetchType.EAGER)
+    @ElementCollection(targetClass = DriverQualifications.class, fetch = FetchType.LAZY)
     @CollectionTable(
             name = "employee_qualifications",
             joinColumns = @JoinColumn(name = "employee_id")
@@ -27,14 +26,12 @@ public class Employee extends Person {
     @Column(name = "qualification")
     private Set<DriverQualifications> driverQualifications = new HashSet<>();
 
-    @OneToOne(fetch = FetchType.EAGER, orphanRemoval = true, cascade = CascadeType.ALL)
+    @OneToOne(fetch = FetchType.LAZY, orphanRemoval = true, cascade = CascadeType.ALL)
     @JoinColumn(name = "driving_license_id")
-    @ToString.Exclude
     private DrivingLicense drivingLicense;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "company_id")
-    @ToString.Exclude
     private Company company;
 
     @NotNull
@@ -43,10 +40,8 @@ public class Employee extends Person {
     private BigDecimal salary = BigDecimal.ZERO;
 
     @OneToMany(mappedBy = "employee", fetch = FetchType.LAZY)
-    @ToString.Exclude
     private Set<Vehicle> vehicleSet = new HashSet<>();
 
     @OneToMany(mappedBy = "employee", fetch = FetchType.LAZY)
-    @ToString.Exclude
     private Set<Transport> transportSet  = new HashSet<>();
 }

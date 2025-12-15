@@ -104,23 +104,13 @@ public class CompanyGeneralServiceImpl implements CompanyGeneralService {
     }
 
     @Override
-    public List<Company> sortCompaniesByNameAscending() {
-        return sorting.sortCompaniesByNameAscending();
+    public List<Company> sortCompaniesByNameAscending(boolean isAscending) {
+        return sorting.sortCompaniesByNameAscending(true);
     }
 
     @Override
-    public List<Company> sortCompaniesByNameDescending() {
-        return sorting.sortCompaniesByNameDescending();
-    }
-
-    @Override
-    public List<Company> sortCompaniesByRevenueAscending() {
-        return sorting.sortCompaniesByRevenueAscending();
-    }
-
-    @Override
-    public List<Company> sortCompaniesByRevenueDescending() {
-        return sorting.sortCompaniesByRevenueDescending();
+    public List<Company> sortCompaniesByRevenueAscending(boolean isAscending) {
+        return sorting.sortCompaniesByRevenueAscending(true);
     }
 
     @Override

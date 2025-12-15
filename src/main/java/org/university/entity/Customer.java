@@ -15,7 +15,6 @@ import java.util.Set;
 @Table(name = "customer")
 @Getter
 @Setter
-@ToString
 @NoArgsConstructor
 @AllArgsConstructor
 public class Customer extends Person {
@@ -25,6 +24,5 @@ public class Customer extends Person {
     private BigDecimal budget = BigDecimal.ZERO;
 
     @OneToMany(mappedBy = "customer")
-    @ToString.Exclude
     private Set<Transport> transportSet = new HashSet<>();
 }

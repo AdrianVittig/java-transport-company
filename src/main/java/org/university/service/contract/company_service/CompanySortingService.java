@@ -5,8 +5,6 @@ import org.university.entity.Company;
 import java.util.List;
 
 public interface CompanySortingService {
-    List<Company> sortCompaniesByNameAscending();
-    List<Company> sortCompaniesByNameDescending();
-    List<Company> sortCompaniesByRevenueAscending();
-    List<Company> sortCompaniesByRevenueDescending();
+    List<Company> sortCompaniesByNameAscending(boolean isAscending);
+    List<Company> sortCompaniesByRevenueAscending(boolean isAscending);
 }

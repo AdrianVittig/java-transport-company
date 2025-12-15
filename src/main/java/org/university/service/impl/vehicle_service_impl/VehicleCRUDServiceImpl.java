@@ -19,11 +19,13 @@ public class VehicleCRUDServiceImpl implements VehicleCRUDService {
     private final VehicleDao vehicleDao;
     private final CompanyDao companyDao;
     private final EmployeeDao employeeDao;
+    private final TransportDao transportDao;
 
     public VehicleCRUDServiceImpl(VehicleDao vehicleDao, CompanyDao companyDao, EmployeeDao employeeDao, TransportDao transportDao) {
         this.vehicleDao = vehicleDao;
         this.companyDao = companyDao;
         this.employeeDao = employeeDao;
+        this.transportDao = transportDao;
     }
 
     @Override
@@ -163,8 +165,10 @@ public class VehicleCRUDServiceImpl implements VehicleCRUDService {
             throw new DAOException("Vehicle with id " + vehicleId + " does not exist");
         }
 
-        return vehicle.getTransportSet()
+        return transportDao.getAllTransports()
                 .stream()
+                .filter(transport -> transport.getVehicle() != null
+                && transport.getVehicle().getId().equals(vehicleId))
                 .map(Transport::getId)
                 .collect(Collectors.toSet());
     }
